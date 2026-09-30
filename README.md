@@ -14,8 +14,8 @@ No entity IDs are built in. Choose the entity in the visual editor or set it in 
 - Short/long flash actions when the light reports flash support.
 - Transition duration applied with control actions.
 - Switch on/off control with current state and friendly name.
-- Light controls expand only while the light is on; when off, the card shows a compact power row. Switch cards also use a compact layout while off.
-- When a switch is on, its status panel expands; when off, only the compact power control remains below the card header.
+- Light controls stay collapsed while on until **Adjust controls** is selected; **Hide controls** returns to the compact layout. When off, only the status and power row remain.
+- Switches stay compact in both states, showing the state and power control without an unnecessary detail panel.
 - Controls are capability-driven; unsupported or unavailable attributes are not guessed.
 - Responsive, theme-aware design; no external assets, libraries, analytics, or credentials.
 

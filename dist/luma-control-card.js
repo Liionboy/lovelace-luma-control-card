@@ -1,5 +1,5 @@
 const CARD_TYPE = "luma-control-card";
-const VERSION = "1.1.0";
+const VERSION = "1.2.0";
 
 const STYLE = `
   :host{display:block;color:var(--primary-text-color)}
@@ -9,7 +9,7 @@ const STYLE = `
   .summary{display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-top:18px}.summary-label{font-size:clamp(24px,4vw,34px);font-weight:800;letter-spacing:-.06em;line-height:1}.summary-meta{color:var(--secondary-text-color);font-size:12px;text-align:right}.section{margin-top:18px;padding-top:16px;border-top:1px solid color-mix(in srgb,var(--divider-color) 72%,transparent)}.section-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:9px}.section-title{font-size:12px;font-weight:760}.value{color:var(--secondary-text-color);font-size:12px;font-variant-numeric:tabular-nums}.range{display:block;width:100%;height:28px;margin:0;accent-color:var(--glow);cursor:pointer;touch-action:pan-y}.range-labels{display:flex;justify-content:space-between;color:var(--secondary-text-color);font-size:10px}
   .color-row{display:flex;align-items:center;gap:12px}.color-input{width:48px;height:42px;flex:none;padding:3px;border:1px solid var(--divider-color);border-radius:13px;background:var(--card-background-color,#fff);cursor:pointer}.color-copy{min-width:0}.color-hint{color:var(--secondary-text-color);font-size:11px;line-height:1.4}.select-wrap{position:relative}.select{width:100%;min-height:42px;padding:0 38px 0 13px;border:1px solid var(--divider-color);border-radius:13px;background:var(--card-background-color,#fff);color:var(--primary-text-color);font:inherit;font-size:13px;font-weight:650;appearance:none}.select-wrap:after{position:absolute;top:50%;right:14px;color:var(--secondary-text-color);content:'⌄';pointer-events:none;transform:translateY(-60%)}
   .flash-actions{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.flash-action{min-height:40px;border:1px solid var(--divider-color);border-radius:12px;background:var(--card-background-color,#fff);color:var(--primary-text-color);font:inherit;font-size:12px;font-weight:700;cursor:pointer}.flash-action:hover:not(:disabled){border-color:var(--primary-color);color:var(--primary-color)}.flash-action:disabled{opacity:.55;cursor:wait}
-  .compact-control{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}.compact-control .feedback{min-width:0}.compact-control.switch-compact{justify-content:flex-end}
+  .compact-control{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:12px}.compact-control .feedback{min-width:0}.compact-control.switch-compact:not(.switch-on){justify-content:flex-end}.compact-control.light-compact{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.light-compact .power,.controls-toggle{width:100%;min-width:0;padding:0 9px;font-size:12px}.controls-toggle{min-height:42px;border:1px solid var(--divider-color);border-radius:14px;background:var(--card-background-color,#fff);color:var(--primary-text-color);font:inherit;font-weight:740;cursor:pointer;transition:background .15s ease,border-color .15s ease}.controls-toggle:hover{border-color:var(--primary-color);background:color-mix(in srgb,var(--primary-color) 7%,var(--card-background-color,#fff))}.section-control-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:18px;padding-top:14px;border-top:1px solid color-mix(in srgb,var(--divider-color) 72%,transparent)}.section-control-head .section-title{font-size:12px;font-weight:760}.section-control-head .controls-toggle{width:auto;min-height:34px;padding:0 11px;border-radius:11px}
   .footer{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:12px;margin-top:20px;padding-top:15px;border-top:1px solid var(--divider-color)}.feedback{min-height:16px;color:var(--secondary-text-color);font-size:11px;line-height:1.4}.feedback.error{color:var(--error-color,#c74343)}.power{display:flex;align-items:center;justify-content:center;gap:8px;min-width:120px;min-height:42px;padding:0 17px;border:0;border-radius:14px;background:var(--glow);color:var(--text-primary-color,#fff);font:inherit;font-size:13px;font-weight:780;cursor:pointer;transition:filter .15s ease,transform .15s ease}.power:hover:not(:disabled){filter:brightness(1.06);transform:translateY(-1px)}.power:active:not(:disabled){transform:translateY(0)}.power.off{border:1px solid var(--divider-color);background:var(--card-background-color,#fff);color:var(--primary-text-color)}.power ha-icon{--mdc-icon-size:18px}.power:disabled{opacity:.55;cursor:wait}
   .switch-panel{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:14px;margin-top:20px;padding:15px;border:1px solid color-mix(in srgb,var(--divider-color) 65%,transparent);border-radius:17px;background:color-mix(in srgb,var(--card-background-color,#fff) 82%,var(--secondary-background-color))}.switch-copy{min-width:0}.switch-name{overflow:hidden;font-size:14px;font-weight:750;text-overflow:ellipsis;white-space:nowrap}.switch-detail{margin-top:4px;color:var(--secondary-text-color);font-size:11px}.switch-panel .power{min-width:104px}
   @media(max-width:380px){.shell{padding:15px}.icon-wrap{width:40px;height:40px}.summary{margin-top:15px}.switch-panel{padding:12px;gap:8px}.switch-panel .power{min-width:84px;padding:0 12px}}
@@ -161,9 +161,15 @@ class LumaControlCard extends HTMLElement {
     const unavailable = this.unavailable ? "disabled" : "";
     const action = this.isOn ? "Turn off" : "Turn on";
     const power = `<button class="power ${this.isOn ? "" : "off"}" data-action="power" ${unavailable || this._pending ? "disabled" : ""}><ha-icon icon="mdi:power"></ha-icon>${this._pending ? "Sending…" : action}</button>`;
+    const hasLightControls = this.supportsBrightness || this.supportsTemperature || this.supportsColor || this.effects.length > 0 || this.supportsFlash;
     if (!this.isOn) {
+      this._showControls = false;
       const message = this.unavailable ? "Entity is unavailable." : (this._feedback || "Turn on to show light controls.");
       return `<div class="compact-control"><div class="feedback ${this._error ? "error" : ""}" role="status">${escapeHtml(message)}</div>${power}</div>`;
+    }
+    if (!this._showControls || !hasLightControls) {
+      const toggle = hasLightControls ? `<button class="controls-toggle" data-action="toggle-controls" aria-expanded="false">Adjust controls</button>` : "";
+      return `<div class="compact-control light-compact">${power}${toggle}</div>`;
     }
 
     const { min, max } = this.tempRange();
@@ -172,6 +178,7 @@ class LumaControlCard extends HTMLElement {
     const sections = [];
 
     sections.push(`<div class="summary"><div class="summary-label">${this.unavailable ? "Light unavailable" : this.isOn ? "Light is on" : "Light is off"}</div><div class="summary-meta">${this.unavailable ? "Check the entity connection" : this.supportsBrightness ? `${brightness}% brightness` : "Power control"}</div></div>`);
+    sections.push(`<div class="section-control-head"><span class="section-title">Light controls</span><button class="controls-toggle" data-action="toggle-controls" aria-expanded="true">Hide controls</button></div>`);
 
     if (this.supportsBrightness) {
       sections.push(`<section class="section"><div class="section-head"><label class="section-title" for="brightness">Brightness</label><output class="value" data-brightness-label>${brightness}%</output></div><input class="range" id="brightness" data-control="brightness" type="range" min="1" max="100" step="1" value="${brightness || 1}" ${unavailable} aria-label="Brightness"><div class="range-labels"><span>Dim</span><span>Bright</span></div></section>`);
@@ -209,11 +216,15 @@ class LumaControlCard extends HTMLElement {
     const action = this.isOn ? "Turn off" : "Turn on";
     const power = `<button class="power ${this.isOn ? "" : "off"}" data-action="power" ${this.unavailable || this._pending ? "disabled" : ""}><ha-icon icon="mdi:power"></ha-icon>${this._pending ? "Sending…" : action}</button>`;
     if (!this.isOn) return `<div class="compact-control switch-compact">${power}</div>`;
-    return `<div class="switch-panel"><div class="switch-copy"><div class="switch-name">Power is on</div><div class="switch-detail">${escapeHtml(this._feedback || detail)}</div></div>${power}</div>${this._error ? `<div class="feedback error" role="alert">${escapeHtml(this._feedback)}</div>` : ""}`;
+    return `<div class="compact-control switch-compact switch-on"><div class="switch-detail">${escapeHtml(this._feedback || detail)}</div>${power}</div>${this._error ? `<div class="feedback error" role="alert">${escapeHtml(this._feedback)}</div>` : ""}`;
   }
 
   bindEvents() {
     this._root.querySelector('[data-action="power"]')?.addEventListener("click", () => this.togglePower());
+    this._root.querySelector('[data-action="toggle-controls"]')?.addEventListener("click", () => {
+      this._showControls = !this._showControls;
+      this.render();
+    });
     const brightness = this._root.querySelector('[data-control="brightness"]');
     brightness?.addEventListener("input", (event) => {
       const value = Number(event.currentTarget.value);
